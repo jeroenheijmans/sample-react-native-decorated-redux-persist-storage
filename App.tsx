@@ -21,8 +21,9 @@ function log(...args: unknown[]) {
 }
 
 async function delay(ms?: number) {
-  log(`[DELAY] For ${ms || 0}ms`);
+  log(`[DELAY] ${ms || 0}ms started`);
   await new Promise(r => setTimeout(r, ms));
+  log(`[DELAY] ${ms || 0}ms finished`);
 }
 
 log('------------------------------------------------');
@@ -67,17 +68,23 @@ const selectStatus = (state: RootState) => state.counter.status;
 
 const decoratedStorage = {
   async getItem(key: string) {
-    log(`[^ - GET] for key '${key}'`);
+    log(`[^ - GET] starting for key '${key}'`);
+    await delay(250);
     const raw = await EncryptedStorage.getItem(key);
+    log(`[^ - GET] resolved for key '${key}'`);
     return raw;
   },
   async setItem(key: string, value: string) {
-    log(`[v - SET] for key '${key}'. Value = `, value);
+    log(`[v - SET] starting for key '${key}'. Value = `, value);
+    await delay(250);
     await EncryptedStorage.setItem(key, value);
+    log(`[v - SET] resolved for key '${key}'. Value = `, value);
   },
   async removeItem(key: string) {
-    log(`[x - DEL] for key '${key}`);
+    log(`[x - DEL] starting for key '${key}`);
+    await delay(250);
     await EncryptedStorage.removeItem(key);
+    log(`[x - DEL] resolved for key '${key}`);
   },
 };
 
@@ -138,7 +145,13 @@ const Counter = () => {
       <View style={styles.buttonsContainer}>
         <Button
           disabled={disabled}
-          title="Reset!"
+          title="Log empty line"
+          onPress={() => console.log('')}
+          color="gray"
+        />
+        <Button
+          disabled={disabled}
+          title="Reset counter to 0"
           onPress={() => dispatch(reset())}
           color="gray"
         />
